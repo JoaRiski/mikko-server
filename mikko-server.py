@@ -4,6 +4,7 @@ import os
 from django.conf import settings
 from django.conf.urls import url
 from django.core.management import execute_from_command_line
+from django import template
 from django.views.generic.edit import FormView
 from django import forms
 
@@ -18,6 +19,7 @@ settings.configure(
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [os.path.join(os.path.dirname(os.path.realpath(__file__)), "templates")],
     }],
+    INSTALLED_APPS=["bootstrapform"],
 )
 
 
@@ -27,6 +29,12 @@ VOICE_OPTIONS = [
     "marko",
     "alan",
 ]
+
+# Templatetags :D
+register = template.Library()
+@register.filter(name='css_funcs')
+def add_css_class(field, css):
+    return field.as_widget(attrs={"class":css})
 
 
 class SubmitForm(forms.Form):
