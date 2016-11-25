@@ -1,5 +1,35 @@
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="send">
-</form>
+{% load bootstrap %}
+<!doctype html>
+<html>
+    <head>
+        <link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                background: #eee;
+            }
+            .form-control {
+                height: 46px;
+                padding: 10px 16px;
+                font-size: 18px;
+                line-height: 1.3333333;
+                border-radius: 6px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="jumbotron">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3">
+                        <h1>Mikko</h1>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            {{ form|bootstrap }}
+                            <input type="submit" value="Send" class="btn btn-lg btn-success btn-block">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
