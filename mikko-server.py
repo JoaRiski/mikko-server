@@ -32,9 +32,11 @@ VOICE_OPTIONS = [
 
 # Templatetags :D
 register = template.Library()
+
+
 @register.filter(name='css_funcs')
 def add_css_class(field, css):
-    return field.as_widget(attrs={"class":css})
+    return field.as_widget(attrs={"class": css})
 
 
 class SubmitForm(forms.Form):
