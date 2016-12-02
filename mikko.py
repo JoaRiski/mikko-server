@@ -68,14 +68,32 @@ def get_tts_url(text, engine, voice, language, fx=None, fx_level=None):
     )
 
 
+def clear_invalid_cache(cache_name):
+    if not os.path.exists(cache_name):
+        return
+    if os.stat(cache_name).st_size == 0:
+        os.remove(cache_name)
+
+
+def cache_response(response, cache_name):
+    assert response.headers["content-length"] > 0
+    assert len(response.content) > 0
+    with open(cache_name, 'wb') as outf:
+        outf.write(response.content)
+
+
 def download(text, engine, language, voice, fx=None, fx_level=None):
     url = get_tts_url(**locals())
     temp_name = os.path.join(tempfile.gettempdir(), 'tts-%s.mp3' % hashlib.md5(url).hexdigest())
-    if not os.path.exists(temp_name):
-        with open(temp_name, 'wb') as outf:
-            resp = requests.get(url)
-            resp.raise_for_status()
-            outf.write(resp.content)
+
+    clear_invalid_cache(temp_name)
+    if os.path.exists(temp_name):
+        return temp_name
+
+    resp = requests.get(url)
+    resp.raise_for_status()
+    cache_response(resp, temp_name)
+
     return temp_name
 
 
