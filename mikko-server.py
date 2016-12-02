@@ -56,9 +56,6 @@ class IndexView(FormView):
                 "voice": voice
             },
             shell=True,
-            # stdin=None,
-            # stdout=None,
-            # stderr=None,
             close_fds=True
         )
 
