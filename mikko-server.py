@@ -1,5 +1,7 @@
-import sys
+# -*- coding: utf-8 -*-
 import os
+import re
+import sys
 
 from django.conf import settings
 from django.conf.urls import url
@@ -53,13 +55,16 @@ class IndexView(FormView):
 
     def launch_mikko(self, text, voice):
         Popen(
-            "python mikko.py %(text)s --%(voice)s" % {
-                "text": text,
-                "voice": voice
+            "python mikko.py '%(text)s' --%(voice)s" % {
+                "text": self.sanitize_text(text),
+                "voice": voice,
             },
             shell=True,
             close_fds=True
         )
+
+    def sanitize_text(self, text):
+        return re.sub(r'[^a-zA-Z0-9äÄåÅöÖ \.\,#]', '', text)
 
     def form_valid(self, form):
         self.launch_mikko(
