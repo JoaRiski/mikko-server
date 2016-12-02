@@ -6,7 +6,6 @@ import argparse
 import hashlib
 import os
 import requests
-import sys
 import tempfile
 
 from urllib import urlencode
@@ -69,14 +68,32 @@ def get_tts_url(text, engine, voice, language, fx=None, fx_level=None):
     )
 
 
+def clear_invalid_cache(cache_name):
+    if not os.path.exists(cache_name):
+        return
+    if os.stat(cache_name).st_size == 0:
+        os.remove(cache_name)
+
+
+def cache_response(response, cache_name):
+    assert response.headers["content-length"] > 0
+    assert len(response.content) > 0
+    with open(cache_name, 'wb') as outf:
+        outf.write(response.content)
+
+
 def download(text, engine, language, voice, fx=None, fx_level=None):
     url = get_tts_url(**locals())
     temp_name = os.path.join(tempfile.gettempdir(), 'tts-%s.mp3' % hashlib.md5(url).hexdigest())
-    if not os.path.exists(temp_name):
-        with open(temp_name, 'wb') as outf:
-            resp = requests.get(url)
-            resp.raise_for_status()
-            outf.write(resp.content)
+
+    clear_invalid_cache(temp_name)
+    if os.path.exists(temp_name):
+        return temp_name
+
+    resp = requests.get(url)
+    resp.raise_for_status()
+    cache_response(resp, temp_name)
+
     return temp_name
 
 
@@ -124,17 +141,6 @@ def parse_command_line_arguments():
     )
     return parser.parse_args()
 
-
-def cli_command(command):
-    global current_voice, voices
-    if command in ("q", "exit"):
-        sys.exit()
-    elif command in voices:
-        current_voice = command
-    else:
-        print("Unrecognized command.")
-
-
 if __name__ == "__main__":
     args = parse_command_line_arguments()
     if args.milla:
@@ -143,24 +149,4 @@ if __name__ == "__main__":
         current_voice = "marko"
     elif args.alan:
         current_voice = "alan"
-    text = args.text
-    if text:
-        if len(text) == 1 and os.path.isfile(text[0]):
-            with open(text[0], "rb") as fp:
-                for line in fp:
-                    speak(line.decode("utf-8", "ignore"))
-        else:
-            speak(b" ".join(text).decode("utf-8", "ignore"))
-    else:
-        while True:
-            try:
-                text = raw_input("%s> " % (current_voice,))
-            except KeyboardInterrupt:
-                sys.exit()
-            text = text.decode("utf-8", "ignore").strip()
-            if not text:
-                continue
-            elif text[0] == ".":
-                cli_command(text[1:])
-            else:
-                speak(text)
+    speak(b" ".join(args.text).decode("utf-8", "ignore"))
