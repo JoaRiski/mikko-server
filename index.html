@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Mikko</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+    <style>
+      body {
+        background: #eee;
+      }
+      .form-control {
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="jumbotron">
+        <form>
+          <div class="form-group">
+            <label for="voice">Voice</label>
+            <select id="voice" class="form-control">
+              <option value="mikko">Mikko</option>
+              <option value="milla">Milla</option>
+              <option value="marko">Marko</option>
+              <option value="alan">Alan</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="text">Text</label>
+            <input type="text" id="text" class="form-control" autofocus>
+          </div>
+          <button type="submit" class="btn btn-lg btn-success btn-block">Send</button>
+        </form>
+      </div>
+    </div>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('form');
+        const voiceInput = document.querySelector('#voice');
+        const textInput = document.querySelector('#text');
+        const isBlank = RegExp.prototype.test.bind(/^\s*$/);
+
+        form.addEventListener('submit', ev => {
+          const voice = voiceInput.value;
+          const text = textInput.value;
+
+          ev.preventDefault();
+          if (![voice, text].find(isBlank)) {
+            fetch(window.location, {
+              method: 'POST',
+              body: JSON.stringify({ voice, text }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+          }
+          textInput.value = '';
+          textInput.focus();
+        });
+      });
+    </script>
+  </body>
+</html>

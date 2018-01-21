@@ -1,0 +1,26 @@
+{
+  "name": "mikko-server",
+  "version": "1.0.0",
+  "description": "Takes in text over HTTP and plays it on the host machine using mikko TTS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RauliL/mikko-server.git"
+  },
+  "author": "Rauli Laine <rauli.laine@iki.fi> (https://raulil.github.io/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RauliL/mikko-server/issues"
+  },
+  "homepage": "https://github.com/RauliL/mikko-server#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "build-url": "^1.0.10",
+    "express": "^4.16.2",
+    "md5": "^2.2.1",
+    "play-sound": "^1.1.2"
+  }
+}
