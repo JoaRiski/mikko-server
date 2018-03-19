@@ -1,0 +1,45 @@
+doctype html
+html
+  head
+    title Mikko
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css")
+  body
+    .container
+      .jumbotron
+        form
+          .form-group
+            label(for="voice") Voice
+            select#voice.form-control
+              each voice in voices
+                option(value=voice)= voice[0].toUpperCase() + voice.substring(1)
+          .form-group
+            label(for="text") Text
+            input#text.form-control(autofocus)
+          button.btn.btn-lg.btn-block.btn-success Send
+    script.
+      window.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('form');
+        const voiceInput = document.querySelector('#voice');
+        const textInput = document.querySelector('#text');
+        const isBlank = RegExp.prototype.test.bind(/^\s*$/);
+
+        form.addEventListener('submit', ev => {
+          const voice = voiceInput.value;
+          const text = textInput.value;
+
+          ev.preventDefault();
+          if ([voice, text].find(isBlank) == null) {
+            fetch(window.location, {
+              method: 'POST',
+              body: JSON.stringify({ voice, text }),
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+          }
+          textInput.value = '';
+          textInput.focus();
+        });
+      });

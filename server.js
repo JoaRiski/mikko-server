@@ -49,9 +49,10 @@ const queue = [];
 let isPlaying = false;
 
 app.use(bodyParser.json());
+app.set('view engine', 'pug');
 
 app.get('/', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'index.html'));
+  res.render('index', { voices: Object.keys(VOICE_CONFIGURATIONS) });
 });
 
 app.post('/', (req, res) => {
