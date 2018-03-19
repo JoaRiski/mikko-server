@@ -20,7 +20,9 @@
     "body-parser": "^1.18.2",
     "build-url": "^1.0.10",
     "express": "^4.16.2",
+    "lame": "^1.2.4",
     "md5": "^2.2.1",
-    "play-sound": "^1.1.2"
+    "request": "^2.85.0",
+    "speaker": "^0.4.0"
   }
 }
