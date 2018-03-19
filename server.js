@@ -8,6 +8,7 @@ const os = require('os');
 const path = require('path');
 const request = require('request');
 const speaker = require('speaker');
+const winston = require('winston');
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8080;
 const VOICE_CONFIGURATIONS = {
@@ -33,6 +34,16 @@ const VOICE_CONFIGURATIONS = {
   }
 };
 
+// Configure logging.
+const log = new (winston.Logger)({
+  transports: [
+    new (winston.transports.Console)({
+      colorize: !process.env.NO_COLOR,
+      timestamp: true
+    })
+  ]
+});
+
 const app = express();
 const queue = [];
 let isPlaying = false;
@@ -46,18 +57,22 @@ app.get('/', (req, res) => {
 app.post('/', (req, res) => {
   const { voice, text } = req.body;
 
-  if ([voice, text].find(RegExp.prototype.test.bind(/^\s*$/))) {
+  if ([voice, text].find(RegExp.prototype.test.bind(/^\s*$/)) != null) {
+    log.error(`${req.ip}: Received empty request.`);
+    res.status(400).send({ error: 'Empty request.' });
     return;
   }
 
   const voiceConfig = VOICE_CONFIGURATIONS[voice];
 
   if (!voiceConfig) {
-    process.stderr.write(`Unrecognized voice: ${voice}\n`);
+    log.error(`${req.ip}: Unrecognized voice: ${voice}`);
+    res.status(400).send({ error: 'Unrecognized voice.' });
     return;
   }
 
   res.json({ nep: true });
+  log.info(`${req.ip}: <${voice}> ${text}`);
 
   const hash = buildHash(text, voiceConfig);
   const file = path.join(os.tmpdir(), `tts-${hash}.mp3`);
@@ -81,12 +96,12 @@ app.post('/', (req, res) => {
   try {
     request(url).pipe(fs.createWriteStream(file)).on('close', () => addToQueue(file));
   } catch (err) {
-    console.error(err);
+    log.error(err);
   }
 });
 
 app.listen(PORT, () => {
-  process.stdout.write(`Listening on port ${PORT}.\n`);
+  log.info(`Listening on port ${PORT}.`);
 });
 
 function addToQueue(file) {
